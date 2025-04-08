@@ -1,0 +1,26 @@
+[build-system]
+requires = [ "flit_core >=3.2,<4",]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "{{ project_name }}"
+version = "{{ version }}"
+description = "{{ project_description }}"
+readme = "README.md"
+dependencies = [ "click", "radon", "tabulate", "toml",]
+
+[[project.authors]]
+name = "{{ author_name }}"
+email = "{{ auuthor_email}}"
+
+[project.optional-dependencies]
+dev = [ "build", "pytest", "pytest-cov", "pytest-mock", "mypy", "black", "flake8", "isort", "jinja2", "pylint",]
+
+[project.scripts]
+hello = "hello.main:main"
+
+[tool.black]
+line-length = 88
+target-version = [ "py313",]
+include = "\\.pyi?$"
+exclude = "/(\n    \\.git\n    | \\.hg\n    | \\.mypy_cache\n    | \\.tox\n    | \\.venv\n    | _build\n    | buck-out\n    | build\n    | dist\n)/\n"
