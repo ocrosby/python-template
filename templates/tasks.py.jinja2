@@ -55,16 +55,16 @@ def install(c: Context, prod: bool = False) -> None:
 @task(aliases=["f"])
 def format_code(c: Context) -> None:
     """Format code using black."""
-    c.run("isort py_cyclo/ tests/ tasks.py update_version.py")
-    c.run("black py_cyclo/ tests/ tasks.py update_version.py")
+    c.run("isort py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("black py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
 
 
 @task(aliases=["l"], pre=[format_code])
 def lint(c: Context) -> None:
     """Lint code using flake8, pylint, and isort."""
-    c.run("flake8 py_cyclo/ tests/ tasks.py update_version.py")
-    c.run("pylint py_cyclo/ tests/ tasks.py update_version.py")
-    c.run("isort --check-only py_cyclo/ tests/ tasks.py update_version.py")
+    c.run("flake8 {{ project_name }}/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("pylint {{ project_name }}/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("isort --check-only py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
 
 
 @task(aliases=["t"])

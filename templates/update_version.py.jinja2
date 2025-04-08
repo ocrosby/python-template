@@ -1,9 +1,9 @@
 """
-This script updates the version in `pyproject.toml.jinja`, `VERSION` file,
-`docs/source/conf.py`, `package.json.jinja2`, and `package-lock.json`.
+This script updates the version in `pyproject.toml`, `VERSION` file,
+`docs/source/conf.py`, `package.json`, and `package-lock.json`.
 
 Usage:
-    python update_version.py <version>
+    python update_version.py.jinja2 <version>
 """
 
 import argparse
@@ -55,7 +55,7 @@ def update_file(
 
 def update_version_in_pyproject_toml(version: str) -> None:
     """
-    Updates the version in `pyproject.toml.jinja`.
+    Updates the version in `pyproject.toml`.
 
     Args:
         version (str): The new version to set.
@@ -71,7 +71,7 @@ def update_version_in_pyproject_toml(version: str) -> None:
         content["project"]["version"] = version
         toml.dump(content, file)
 
-    update_file(Path("pyproject.toml.jinja"), read_func, write_func)
+    update_file(Path("pyproject.toml"), read_func, write_func)
 
 
 def update_version_in_version_txt(version: str) -> None:
@@ -147,10 +147,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     files_to_update = {
-        Path("pyproject.toml.jinja"): update_version_in_pyproject_toml,
+        Path("pyproject.toml"): update_version_in_pyproject_toml,
         Path("VERSION"): update_version_in_version_txt,
         Path("docs/source/conf.py"): update_version_in_conf_py,
-        Path("package.json.jinja2"): lambda v: update_version_in_json(Path("package.json.jinja2"), v),
+        Path("package.json"): lambda v: update_version_in_json(Path("templates/package.json.jinja2"), v),
         Path("package-lock.json"): lambda v: update_version_in_json(
             Path("package-lock.json"), v
         ),
