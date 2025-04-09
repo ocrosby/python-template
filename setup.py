@@ -19,7 +19,7 @@ def render_template(template_path, output_path, context):
 def main(target_dir: str):
     """Setup script to generate project files based on templates."""
     # Delete the target directory if it exists
-    if os.path.exists(target_dir):
+    if os.path.exists(target_dir) and target_dir != '.':
         shutil.rmtree(target_dir)
 
     questions = [
