@@ -3,9 +3,9 @@ requires = [ "flit_core >=3.2,<4",]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "{{ package_name }}"
-version = "{{ version }}"
-description = "{{ description }}"
+name = "[[ package_name ]]"
+version = "[[ version ]]"
+description = "[[ description ]]"
 readme = "README.md"
 dependencies = [
     "click",
@@ -13,13 +13,12 @@ dependencies = [
     "tabulate",
     "toml",
 ]
+authors = [
+    { name = "[[ author ]]", email = "[[ email ]]" }
+]
 
 [tool.flit.module]
-module = "{{ package_name }}"
-
-[[project.authors]]
-name = "{{ author }}"
-email = "{{ email }}"
+module = "[[ package_name ]]"
 
 [project.optional-dependencies]
 dev = [
@@ -40,7 +39,7 @@ dev = [
 ]
 
 [project.scripts]
-main = "{{ package_name }}.main:main"
+main = "[[ package_name ]].main:main"
 
 [tool.black]
 line-length = 88

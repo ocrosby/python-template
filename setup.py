@@ -1,10 +1,11 @@
+import logging
 import os
 import shutil
 from datetime import datetime
 from typing import Dict, Any, List
 
 import click
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, UndefinedError
 from InquirerPy import prompt
 
 VERSION = '0.1.0'
@@ -37,12 +38,22 @@ class TemplateRenderer:
         :param output_path: The path where the rendered file will be saved.
         :return: None
         """
-        env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
-        template = env.get_template(os.path.basename(template_path))
-        content = template.render(self.context)
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        with open(output_path, 'w') as file:
-            file.write(content)
+        try:
+            env = Environment(
+                loader=FileSystemLoader(os.path.dirname(template_path)),
+                block_start_string='[[%',
+                block_end_string='%]]',
+                variable_start_string='[[',
+                variable_end_string=']]',
+            )
+            template = env.get_template(os.path.basename(template_path))
+            content = template.render(self.context)
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            with open(output_path, 'w') as file:
+                file.write(content)
+        except UndefinedError as err:
+            logging.error(f"Error rendering template {template_path}: {err}")
+            raise
 
 class DirectoryManager:
     """

@@ -22,16 +22,16 @@ logging.basicConfig(
 
 def update_file(
     update_file_path: Path,
-    read_func: Callable[[Any], Any],
-    write_func: Callable[[Any, Any], None],
+    read_func: Callable,
+    write_func: Callable,
 ) -> None:
     """
     Reads the content of a file, updates it, and writes it back.
 
     Args:
         update_file_path (Path): The path to the file to be updated.
-        read_func (Callable[[Any], Any]): A function to read the file content.
-        write_func (Callable[[Any, Any], None]): func to write the updates
+        read_func (Callable): A function to read the file content.
+        write_func (Callable: func to write the updates
 
     Returns:
         None
