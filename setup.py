@@ -1,45 +1,119 @@
 import os
 import shutil
 from datetime import datetime
+from typing import Dict, Any, List
+
 import click
 from jinja2 import Environment, FileSystemLoader
 from InquirerPy import prompt
 
 VERSION = '0.1.0'
 
-def render_template(template_path, output_path, context):
-    env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
-    template = env.get_template(os.path.basename(template_path))
-    content = template.render(context)
-    with open(output_path, 'w') as file:
-        file.write(content)
+class TemplateRenderer:
+    """
+    TemplateRenderer is responsible for rendering Jinja2 templates with the provided context.
+    """
+    def __init__(self, templates_to_render, target_dir, context) -> None:
+        self.templates_to_render = templates_to_render
+        self.target_dir = target_dir
+        self.context = context
 
-@click.command()
-@click.option('--target-dir', '-t', default='.', help='Target directory for generated files (default: current directory).')
-def main(target_dir: str):
-    """Setup script to generate project files based on templates."""
-    # Delete the target directory if it exists
-    if os.path.exists(target_dir) and target_dir != '.':
-        shutil.rmtree(target_dir)
+    def render_all(self):
+        """
+        Render all templates in the templates_to_render dictionary.
+        Each template is rendered with the context provided and saved to the target directory.
 
-    questions = [
-        {"type": "input", "name": "project_name", "message": "Enter the project name:", "default": "My Project"},
-        {"type": "input", "name": "project_owner", "message": "Enter the GitHub project owner name:", "default": "fflintstone"},
-        {"type": "input", "name": "author", "message": "Enter the author name:", "default": "Fred Flintstone"},
-        {"type": "input", "name": "description", "message": "Enter the project description:", "default": "A sample project"},
-        {"type": "input", "name": "license", "message": "Enter the license type (e.g., MIT):", "default": "MIT"},
-        {"type": "input", "name": "email", "message": "Enter the author email:", "default": "fred.flintstone@example.com"},
-    ]
+        :return: None
+        """
+        for template_path, output_path in self.templates_to_render.items():
+            output_path = os.path.join(self.target_dir, output_path)
+            self.render_template(template_path, str(output_path))
 
-    context = prompt(questions)
+    def render_template(self, template_path: str, output_path: str) -> None:
+        """
+        Render a template file with the given context and save it to the output path.
 
-    # Store both original and modified project names
-    context['version'] = VERSION
-    context['year'] = str(datetime.now().year) # Set the current year dynamically
-    context['module_name'] = context['project_name'].lower().replace(" ", "-")  # For PyPI
-    context['package_name'] = context['project_name'].lower().replace(" ", "_")  # For internal use
+        :param template_path: The path to the template file.
+        :param output_path: The path where the rendered file will be saved.
+        :return: None
+        """
+        env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
+        template = env.get_template(os.path.basename(template_path))
+        content = template.render(self.context)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, 'w') as file:
+            file.write(content)
 
-    templates_to_render = {
+class DirectoryManager:
+    """
+    DirectoryManager is responsible for managing the target directory and creating necessary directories.
+    """
+    def __init__(self, target_dir: str, package_name: str) -> None:
+        self.target_dir = target_dir
+        self.package_name = package_name
+
+    def delete_target_directory(self):
+        """
+        Delete the target directory if it exists, except for the current directory.
+
+        :return: None
+        """
+        if os.path.exists(self.target_dir) and self.target_dir != '.':
+            shutil.rmtree(self.target_dir)
+
+    def create_directories(self):
+        """
+        Create the necessary directories for the project structure.
+
+        :return: None
+        """
+        os.makedirs(self.target_dir, exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, 'tests'), exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, "src", self.package_name), exist_ok=True)
+
+    def create_package_init_file(self):
+        """
+        Create an empty __init__.py file in the package directory to make it a package.
+
+        :return: None
+        """
+        package_dir = os.path.join(self.target_dir, "src", self.package_name)
+        os.makedirs(package_dir, exist_ok=True)
+        init_file_path = os.path.join(str(package_dir), '__init__.py')
+        with open(init_file_path, 'w') as init_file:
+            pass
+
+class ProjectSetup:
+    """
+    ProjectSetup orchestrates the setup process for generating project files.
+    """
+    def __init__(self, target_dir: str, context: Dict[str, Any], templates_to_render: Dict[str, str]) -> None:
+        self.target_dir = target_dir
+        self.context = context
+        self.templates_to_render = templates_to_render
+        self.package_name = context['package_name']
+        self.dir_manager = DirectoryManager(target_dir, self.package_name)
+        self.renderer = TemplateRenderer(templates_to_render, target_dir, context)
+
+    def run(self):
+        """
+        Execute the project setup process.
+        """
+        self.dir_manager.delete_target_directory()
+        self.dir_manager.create_directories()
+        self.renderer.render_all()
+        self.dir_manager.create_package_init_file()
+        print(f"Setup complete! Files generated in: {os.path.abspath(self.target_dir)}")
+
+def get_templates_config(package_name: str) -> Dict[str, Any]:
+    """
+    Get the templates configuration for the project setup.
+    This function returns a dictionary mapping template paths to their corresponding output paths.
+
+    :param package_name: The name of the package to be used in the project.
+    :return: A dictionary mapping template paths to their corresponding output paths.
+    """
+    return {
         'templates/tests/__init__.py.jinja2': 'tests/__init__.py',
         'templates/tests/conftest.py.jinja2': 'tests/conftest.py',
         'templates/tests/test_example.py.jinja2': 'tests/test_example.py',
@@ -57,37 +131,44 @@ def main(target_dir: str):
         'templates/README.md.jinja2': 'README.md',
         'templates/release.config.js.jinja2': 'release.config.js',
         'templates/update_version.py.jinja2': 'update_version.py',
-        'templates/app/__init__.py.jinja2': os.path.join(context.get('package_name'), '__init__.py'),
-        'templates/app/main.py.jinja2': os.path.join(context.get('package_name'), 'main.py'),
-        # Add other template files here
+        'templates/src/app/__init__.py.jinja2': os.path.join("src", package_name, '__init__.py'),
+        'templates/src/app/main.py.jinja2': os.path.join("src", package_name, 'main.py'),
     }
 
-    # Ensure the target directory exists
-    os.makedirs(target_dir, exist_ok=True)
+def get_questions() -> List[Dict[str, str]]:
+    return [
+        {"type": "input", "name": "project_name", "message": "Enter the project name:", "default": "My Project"},
+        {"type": "input", "name": "project_owner", "message": "Enter the GitHub project owner name:", "default": "fflintstone"},
+        {"type": "input", "name": "author", "message": "Enter the author name:", "default": "Fred Flintstone"},
+        {"type": "input", "name": "description", "message": "Enter the project description:", "default": "A sample project"},
+        {"type": "input", "name": "license", "message": "Enter the license type (e.g., MIT):", "default": "MIT"},
+        {"type": "input", "name": "email", "message": "Enter the author email:", "default": "fred.flintstone@example.com"},
+    ]
 
-    # Ensure the tests directory exists
-    tests_dir = os.path.join(target_dir, 'tests')
-    os.makedirs(tests_dir, exist_ok=True)
+def prepare_context() -> Dict[str, Any]:
+    """
+    Prepare the context for rendering templates.
+    This function prompts the user for project details and returns a dictionary
 
-    # Ensure the app directory exists
-    app_dir = os.path.join(target_dir, context.get('package_name'))
-    os.makedirs(app_dir, exist_ok=True)
+    :return: A dictionary containing project details and other context information.
+    """
+    questions = get_questions()
+    context = prompt(questions)
+    context['version'] = VERSION
+    context['year'] = str(datetime.now().year)
+    context['module_name'] = context['project_name'].lower().replace(" ", "-")
+    context['package_name'] = context['project_name'].lower().replace(" ", "_")
 
-    for template_path, output_path in templates_to_render.items():
-        # AAdjust the output path to be relative to the target directory
-        output_path = os.path.join(target_dir, output_path)
-        render_template(template_path, output_path, context)
+    return context
 
-    # Create the package directory using the internal package name
-    package_dir = os.path.join(target_dir, context['package_name'])
-    os.makedirs(package_dir, exist_ok=True)
-
-    # Create an empty __init__.py file in the package directory
-    init_file_path = os.path.join(package_dir, '__init__.py')
-    with open(init_file_path, 'w') as init_file:
-        pass  # Create an empty file
-
-    print(f"Setup complete! Files generated in : {os.path.abspath(target_dir)}")
+@click.command()
+@click.option('--target-dir', '-t', default='.', help='Target directory for generated files (default: current directory).')
+def main(target_dir: str):
+    """Setup script to generate project files based on templates."""
+    context = prepare_context()
+    templates_to_render = get_templates_config(context['package_name'])
+    setup = ProjectSetup(target_dir, context, templates_to_render)
+    setup.run()
 
 if __name__ == "__main__":
     main()
