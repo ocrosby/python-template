@@ -148,6 +148,7 @@ def get_templates_config(package_name: str) -> Dict[str, Any]:
         'templates/pyproject.toml.jinja2': 'pyproject.toml',
         'templates/pytest.ini.jinja2': 'pytest.ini',
         'templates/README.md.jinja2': 'README.md',
+        'templates/tasks.py.jinja2': 'tasks.py',
         'templates/release.config.js.jinja2': 'release.config.js',
         'templates/update_version.py.jinja2': 'update_version.py',
         'templates/src/app/__init__.py.jinja2': os.path.join("src", package_name, '__init__.py'),
