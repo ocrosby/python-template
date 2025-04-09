@@ -2,35 +2,24 @@
 
 This is a template repository for creating Python projects.
 
-## Installation
+From a repository created from this template, you can create a new project by following these steps:
+
+## Step 1. Initial Setup
 
 ```bash
-python3.13 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+./setup.sh
 ```
 
-## Initial Setup
+## Step 2. Commit and Push
+
+Please be careful to not attempt to commit and push back to the template repository.
+These steps are intended to be run in a new repository created from this template.
 
 ```bash
-source .venv/bin/activate
-
-# Create a new project structure in the current directory
-python setup.py -t .
+git checkout -b feature/init
+git add .
+git commit -m "chore: initial setup"
+git push --set-upstream origin feature/init
 ```
 
-When you are satisfied with the initial structure of the project you should remove the setup virtual environment, 
-templates directory, and the requirements.txt file. Then rebuild the .venv directory with the project dependencies.
-
-```bash
-deactivate
-rm -rf .venv
-rm -rf templates
-rm -f requirements.txt
-python3.13 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install flit invoke
-invoke install
-```
+Yes, that's all you need to do.
