@@ -68,6 +68,7 @@ class DirectoryManager:
         :return: None
         """
         os.makedirs(self.target_dir, exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, '.github', 'workflows'), exist_ok=True)
         os.makedirs(os.path.join(self.target_dir, 'tests'), exist_ok=True)
         os.makedirs(os.path.join(self.target_dir, "src", self.package_name), exist_ok=True)
 
@@ -114,6 +115,9 @@ def get_templates_config(package_name: str) -> Dict[str, Any]:
     :return: A dictionary mapping template paths to their corresponding output paths.
     """
     return {
+        'templates/.github/workflows/python-checks.yml.jinja2': os.path.join('.github', 'workflows', 'python-checks.yml'),
+        'templates/.github/workflows/release.yml.jinja2': os.path.join('.github', 'workflows', 'release.yml'),
+        'templates/.github/workflows/test.yml.jinja2': os.path.join('.github', 'workflows', 'test.yml'),
         'templates/tests/__init__.py.jinja2': 'tests/__init__.py',
         'templates/tests/conftest.py.jinja2': 'tests/conftest.py',
         'templates/tests/test_example.py.jinja2': 'tests/test_example.py',

@@ -7,17 +7,40 @@ name = "{{ package_name }}"
 version = "{{ version }}"
 description = "{{ description }}"
 readme = "README.md"
-dependencies = [ "click", "radon", "tabulate", "toml",]
+dependencies = [
+    "click",
+    "radon",
+    "tabulate",
+    "toml",
+]
+
+[tool.flit.module]
+module = "{{ package_name }}"
 
 [[project.authors]]
 name = "{{ author }}"
 email = "{{ email }}"
 
 [project.optional-dependencies]
-dev = [ "build", "py-cyclo", "pytest", "pytest-cov", "pytest-mock", "mypy", "black", "flake8", "isort", "jinja2", "pylint",]
+dev = [
+    "bandit",
+    "build",
+    "pip-audit",
+    "py-cyclo",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "mypy",
+    "black",
+    "flake8",
+    "isort",
+    "jinja2",
+    "pylint",
+    "twine",
+]
 
 [project.scripts]
-hello = "hello.main:main"
+main = "{{ package_name }}.main:main"
 
 [tool.black]
 line-length = 88

@@ -55,16 +55,16 @@ def install(c: Context, prod: bool = False) -> None:
 @task(aliases=["f"])
 def format_code(c: Context) -> None:
     """Format code using black."""
-    c.run("isort py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
-    c.run("black py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("isort src/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("black src/ tests/ tasks.py.jinja2 update_version.py.jinja2")
 
 
 @task(aliases=["l"], pre=[format_code])
 def lint(c: Context) -> None:
     """Lint code using flake8, pylint, and isort."""
-    c.run("flake8 {{ project_name }}/ tests/ tasks.py.jinja2 update_version.py.jinja2")
-    c.run("pylint {{ project_name }}/ tests/ tasks.py.jinja2 update_version.py.jinja2")
-    c.run("isort --check-only py_cyclo/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("flake8 src/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("pylint src/ tests/ tasks.py.jinja2 update_version.py.jinja2")
+    c.run("isort --check-only src/ tests/ tasks.py.jinja2 update_version.py.jinja2")
 
 
 @task(aliases=["t"])
@@ -76,7 +76,7 @@ def test(c: Context) -> None:
 @task(aliases=["b"])
 def build(c: Context) -> None:
     """Build the project."""
-    c.run("python -m build")
+    c.run("flit build")
 
 
 @task(aliases=["m"])
