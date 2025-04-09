@@ -82,6 +82,10 @@ class DirectoryManager:
         os.makedirs(os.path.join(self.target_dir, '.github', 'workflows'), exist_ok=True)
         os.makedirs(os.path.join(self.target_dir, 'tests'), exist_ok=True)
         os.makedirs(os.path.join(self.target_dir, "src", self.package_name), exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, "src", self.package_name, 'controllers'), exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, "src", self.package_name, 'models'), exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, "src", self.package_name, 'schemas'), exist_ok=True)
+        os.makedirs(os.path.join(self.target_dir, "src", self.package_name, 'views'), exist_ok=True)
 
     def create_package_init_file(self):
         """
@@ -147,7 +151,14 @@ def get_templates_config(package_name: str) -> Dict[str, Any]:
         'templates/release.config.js.jinja2': 'release.config.js',
         'templates/update_version.py.jinja2': 'update_version.py',
         'templates/src/app/__init__.py.jinja2': os.path.join("src", package_name, '__init__.py'),
+        'templates/src/app/logger.py.jinja2': os.path.join("src", package_name, 'logger.py'),
+        'templates/src/app/conf.py.jinja2': os.path.join("src", package_name, 'conf.py'),
         'templates/src/app/main.py.jinja2': os.path.join("src", package_name, 'main.py'),
+        'templates/src/app/utils.py.jinja2': os.path.join("src", package_name, 'utils.py'),
+        'templates/src/app/controllers/__init__.py.jinja2': os.path.join("src", package_name, 'controllers', '__init__.py'),
+        'templates/src/app/models/__init__.py.jinja2': os.path.join("src", package_name, 'models', '__init__.py'),
+        'templates/src/app/schemas/__init__.py.jinja2': os.path.join("src", package_name, 'schemas', '__init__.py'),
+        'templates/src/app/views/__init__.py.jinja2': os.path.join("src", package_name, 'views', '__init__.py'),
     }
 
 def get_questions() -> List[Dict[str, str]]:

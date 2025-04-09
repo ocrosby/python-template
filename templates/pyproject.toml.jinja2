@@ -9,9 +9,13 @@ description = "[[ description ]]"
 readme = "README.md"
 dependencies = [
     "click",
+    "pydantic",
+    "python-dotenv",
     "radon",
+    "requests",
     "tabulate",
     "toml",
+    "types-toml",
 ]
 authors = [
     { name = "[[ author ]]", email = "[[ email ]]" }
@@ -29,6 +33,7 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
+    "requests-mock",
     "mypy",
     "black",
     "flake8",
